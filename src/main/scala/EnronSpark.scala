@@ -10,6 +10,7 @@ import org.apache.spark.sql.{DataFrame, Row}
 import scala.collection.mutable.ListBuffer
 import common.EnronSparkContext
 import utils.EnronUtils._
+import config._
 
 /**
   * do spark stuff on Enron
@@ -18,10 +19,11 @@ object EnronSpark {
   def main(args: Array[String]) {
     // configure and init spark
     val (sparkContext, sqlContext) = EnronSparkContext.init
+    val config = new Config()
 
     val enronDF = sqlContext.read
-      .json("enron.json")
-      .sample(withReplacement = false, 0.08, Math.random().toLong)
+      .json(config.inputFile)
+      .sample(withReplacement = false, config.sampleSize, Math.random().toLong)
       .cache()
     val enronBodies = enronDF.select("_id.$oid", "X-Origin", "body").filter("body is not null")
 
@@ -33,28 +35,28 @@ object EnronSpark {
     val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
     val filteredWords = remover.transform(wordsData)
     val filteredWordsWithCounts = filteredWords.withColumn("wordCounts", wordCounts(filteredWords("filteredWords")))
-    val hashingTF = new HashingTF().setInputCol("filteredWords").setOutputCol("rawFeatures").setNumFeatures(1000)
+    val hashingTF = new HashingTF().setInputCol("filteredWords").setOutputCol("rawFeatures").setNumFeatures(config.numTextFeatures)
     val featurizedData = hashingTF.transform(filteredWordsWithCounts)
 
-    var WSSE_Results = new ListBuffer[(Int, Double)]()
-    val Array(training, test) = featurizedData.randomSplit(Array(0.8, 0.2), seed = Math.random().toLong)
-    val numClusters = 20
+    var WSSSE_Results = sparkContext.accumulator(new ListBuffer[(Int, Double)]())
+    val Array(training, test) = featurizedData.randomSplit(config.trainingTestSplit, seed = Math.random().toLong)
+    val numClusters = config.numClusters
 
 //    1 to 30 foreach {
-//      i => WSSE_Results += evaluateWSSSE(i, true)
+//      i => WSSSE_Results += evaluateWSSSE(i, true)
 //    }
 
     def evaluateWSSSE(numClusters: Int, calculateScore: Any, groupBy: Boolean = false)
     :(Int, Double, RDD[(Int, String)]) = {
       // split the featurized data into training and test sets
-      val idf = new IDF().setInputCol("rawFeatures").setOutputCol("features").setMinDocFreq(4)
+      val idf = new IDF().setInputCol("rawFeatures").setOutputCol("features").setMinDocFreq(config.idfMinDocFreq)
       val idfModel = idf.fit(training)
 
       def rescaleData(df: DataFrame) :RDD[(String, Vector)] = {
         idfModel.transform(df)
           .select("$oid", "features")
           .map {
-            r => (r.get(0).asInstanceOf[String], r.get(1).asInstanceOf[Vector])
+            row => (row.get(0).asInstanceOf[String], row.get(1).asInstanceOf[Vector])
           }
       }
 
@@ -64,7 +66,7 @@ object EnronSpark {
       val rescaledTestData: RDD[(String, Vector)] = rescaleData(test)
 
       // cluster the data using k-means
-      val numIterations = 100
+      val numIterations = config.trainingIterations
       val clusters: KMeansModel = KMeans.train(rescaledTrainingData.map(_._2), numClusters, numIterations)
       val WSSSE: Double = clusters.computeCost(rescaledTrainingData.map(_._2))
 
@@ -80,28 +82,36 @@ object EnronSpark {
       (numClusters, WSSSE, categorizedResults)
     }
 
-    WSSE_Results.foreach {
+    WSSSE_Results.localValue.foreach {
       case (n, r) => println(s"numClusters: $n with WSSSE of: $r")
     }
 
-    val results = evaluateWSSSE(numClusters, "predict")
-    val rawResultsDF = sqlContext.createDataFrame(results._3)
+    val (_, wssseScore, results) = evaluateWSSSE(numClusters, "predict")
+//    val rawResultsDF = sqlContext.createDataFrame(results._3)
 //    val resultsWithCounts: RDD[(Int, Seq[String], Int)] = resultsDF.rdd.map {
 //      case Row(category: Int, ids: Seq[String]) => (category, ids, ids.size)
 //    }
 //    val newResultsDF = sqlContext.createDataFrame(resultsWithCounts)
 
     // append the new categories back onto the original test data set
-    val remappedResultsDF = test
-      .join(rawResultsDF, test("$oid") === rawResultsDF("_2"))
-      .withColumnRenamed("_1", "category").drop("_2")
+//    val remappedResultsDF = test
+//      .join(rawResultsDF, test("$oid") === rawResultsDF("_2"))
+//      .withColumnRenamed("_1", "category").drop("_2")
 
 //    remappedResultsDF.select("category", "wordCounts").show(100, truncate = false)
-    val rmr = remappedResultsDF.rollup("category", "X-Origin").count().filter("count > 5")
-    rmr.sort(rmr("category"), rmr("count").desc).show(500)
-    println(results._2)
+//    val rmr = remappedResultsDF.rollup("category", "X-Origin").count().filter("count > 5")
+//    rmr.sort(rmr("category"), rmr("count").desc).show(500)
+//    println(results._2)
 
-    FileUtils.deleteDirectory(new File("./results.txt"))
-    results._3.saveAsTextFile("./results.txt")
+    ConfigParser.parser.parse(args, Config()) match {
+      case Some(cfg) =>
+        // if we are using a non-s3 output location, delete the file before writing
+        if (args.length == 0 || !cfg.outputLocation.startsWith("s3://"))
+          FileUtils.deleteDirectory(new File(config.outputLocation))
+        results.saveAsTextFile(config.outputLocation)
+
+      case None =>
+        // arguments are bad, error message will have been displayed
+    }
   }
 }
