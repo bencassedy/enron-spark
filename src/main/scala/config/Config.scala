@@ -5,7 +5,7 @@ package config
   */
 case class Config(
                    numClusters: Int = 20,
-                   sampleSize: Double = 0.0001,
+                   sampleSize: Double = 0.1,
                    numTextFeatures: Int = 1000,
                    idfMinDocFreq: Int = 4,
                    trainingTestSplit: Array[Double] = Array(0.8, 0.2),
