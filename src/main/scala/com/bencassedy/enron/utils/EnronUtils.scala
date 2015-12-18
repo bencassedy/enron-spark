@@ -1,4 +1,4 @@
-package utils
+package com.bencassedy.enron.utils
 
 import org.apache.spark.sql.functions._
 

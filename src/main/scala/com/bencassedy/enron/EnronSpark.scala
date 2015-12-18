@@ -1,15 +1,16 @@
+package com.bencassedy.enron
+
 import java.io.File
 
+import com.bencassedy.enron.common.EnronSparkContext
+import com.bencassedy.enron.config._
+import com.bencassedy.enron.utils.EnronUtils._
 import org.apache.commons.io.FileUtils
 import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
-import org.apache.spark.mllib.linalg.{SparseVector, Vector}
+import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Row}
-
-import common.EnronSparkContext
-import utils.EnronUtils._
-import config._
+import org.apache.spark.sql.DataFrame
 
 /**
   * do spark stuff on Enron
@@ -25,8 +26,9 @@ object EnronSpark {
       .sample(withReplacement = false, config.sampleSize, Math.random().toLong)
       .cache()
     // TODO: filter out (via regex) the giant, multiline 'forwarding' strings in the bodies; these are
-    // distorting the categorization
-    val enronBodies = enronDF.select("_id.$oid", "X-Origin", "body").filter("body is not null")
+    // distorting the categorization; for now, we will filter out any messages containing that string, although
+    // ideally those ought to be loaded in, as they likely contain at least some substantive material
+    val enronBodies = enronDF.select("_id.$oid", "X-Origin", "body").filter("body is not null").filter(!enronDF("body").contains("----- Forwarded"))
 
     // convert bodies into tf-idf vectors by (1) tokenizing the text, (2) removing stopwords, (3) adding in word count
     // mappings (via a UDF) that we will use later on for analysis, (4) hashing the term frequency values, and

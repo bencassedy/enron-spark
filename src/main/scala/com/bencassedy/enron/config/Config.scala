@@ -1,4 +1,4 @@
-package config
+package com.bencassedy.enron.config
 
 /**
   * Project configuration settings

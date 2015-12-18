@@ -1,4 +1,4 @@
-package common
+package com.bencassedy.enron.common
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkContext, SparkConf}

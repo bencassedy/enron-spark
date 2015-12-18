@@ -1,3 +1,5 @@
+package com.bencassedy.enron
+
 import java.io.{File, PrintWriter}
 
 import com.mongodb.hadoop.MongoInputFormat

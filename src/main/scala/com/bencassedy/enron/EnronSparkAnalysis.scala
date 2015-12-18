@@ -1,5 +1,7 @@
-import common.EnronSparkContext
-import config.Config
+package com.bencassedy.enron
+
+import com.bencassedy.enron.common.EnronSparkContext
+import com.bencassedy.enron.config.Config
 /**
   * application for analyzing the results of the knn clustering on a set of
   * test data from Enron; we assume that the clustering application has completed and
@@ -11,7 +13,6 @@ object EnronSparkAnalysis extends App {
   val config = new Config()
   // this import is required to use the dollar sign column notation for sorting 'count'
   // in descending order, below
-  import sqlContext.implicits._
 
   // category counts:
 //  +--------+-----+
@@ -58,9 +59,10 @@ object EnronSparkAnalysis extends App {
   // Category 9 is more garden-variety newsletter-type stuff
   // Category 10 is more forwarding spuriousness
   // Category 13 is a few fantasy football emails with a bunch of html
+  // Category 15 is a bunch of [IMAGE] tagged records
   // Category 18 is more html tag stuff
 
-//  testResults.filter("category = 0").select("body").show(100, truncate = false)
+//  testResults.filter("category = 15").select("body").show(100, truncate = false)
   //      val groupByResults: RDD[(Int, Seq[String])] = rescaledTestData.map {
   //        case (id :String, vector) =>
   //          (clusters.predict(vector), id)
