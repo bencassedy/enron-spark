@@ -2,7 +2,7 @@ package com.bencassedy.enron.utils
 
 import com.bencassedy.enron.config.Config
 import com.bencassedy.enron.utils.EnronUtils._
-import org.apache.spark.ml.feature.{IDFModel, HashingTF, StopWordsRemover, RegexTokenizer}
+import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
@@ -21,14 +21,18 @@ object Transforms {
     * @return
     */
   def transformBodies(df: DataFrame, colName: String)(implicit config: Config): DataFrame = {
+    // the transformers
     val tokenizer = new RegexTokenizer().setInputCol(colName).setOutputCol("words").setPattern("\\w+").setGaps(false)
-    val wordsData = tokenizer.transform(df)
-    val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
-    val filteredWords = remover.transform(wordsData)
-    val filteredWordsWithCounts = filteredWords.withColumn("wordCounts", wordCounts(filteredWords("filteredWords")))
-    val hashingTF = new HashingTF().setInputCol("filteredWords").setOutputCol("rawFeatures").setNumFeatures(config.numTextFeatures)
+    val ngramizer = new NGram().setInputCol("words").setOutputCol("ngrams")
+//    val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
+    val hasher = new HashingTF().setInputCol("ngrams").setOutputCol("rawFeatures").setNumFeatures(config.numTextFeatures)
 
-    hashingTF.transform(filteredWordsWithCounts)
+    // apply the transformers to the data
+    val wordsData = tokenizer.transform(df)
+    val filteredWords = ngramizer.transform(wordsData)
+    val filteredWordsWithCounts = filteredWords.withColumn("wordCounts", wordCounts(filteredWords("ngrams")))
+
+    hasher.transform(filteredWordsWithCounts)
   }
 
   /**
