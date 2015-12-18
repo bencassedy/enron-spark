@@ -14,8 +14,6 @@ case class Config(
                    outputLocation: String = "./results.txt"
                  )
 
-
-
 object ConfigParser {
   val parser = new scopt.OptionParser[Config]("enron-spark") {
     head ("enron-spark", "1.0")
