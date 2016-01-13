@@ -42,7 +42,7 @@ object EnronSparkAnalysis extends App {
       wordTuples: Seq[(String, Int)] => wordTuples
     }
 
-  testGroupings.groupBy("category", "wordCount").count().filter("count > 4").sort($"category", $"count".desc).show(1000)
+  testGroupings.groupBy("category", "wordCount").count().filter("category > 1").filter("count > 4").sort($"category", $"count".desc).show(1000, truncate = false)
 
   // Category 0 is almost entirely the day-to-day type of 'business' emails you see on a regular
   // basis. This is pretty interesting in that it could be used to snowball more business-related emails

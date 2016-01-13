@@ -23,14 +23,15 @@ object Transforms {
   def transformBodies(df: DataFrame, colName: String)(implicit config: Config): DataFrame = {
     // the transformers
     val tokenizer = new RegexTokenizer().setInputCol(colName).setOutputCol("words").setPattern("\\w+").setGaps(false)
-    val ngramizer = new NGram().setInputCol("words").setOutputCol("ngrams")
-//    val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
+    val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
+    val ngramizer = new NGram().setN(3).setInputCol("filteredWords").setOutputCol("ngrams")
     val hasher = new HashingTF().setInputCol("ngrams").setOutputCol("rawFeatures").setNumFeatures(config.numTextFeatures)
 
     // apply the transformers to the data
     val wordsData = tokenizer.transform(df)
-    val filteredWords = ngramizer.transform(wordsData)
-    val filteredWordsWithCounts = filteredWords.withColumn("wordCounts", wordCounts(filteredWords("ngrams")))
+    val filteredWords = remover.transform(wordsData)
+    val ngrams = ngramizer.transform(filteredWords)
+    val filteredWordsWithCounts = ngrams.withColumn("wordCounts", wordCounts(ngrams("ngrams")))
 
     hasher.transform(filteredWordsWithCounts)
   }
