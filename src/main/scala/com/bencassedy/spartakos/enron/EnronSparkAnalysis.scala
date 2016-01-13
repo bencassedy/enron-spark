@@ -1,7 +1,6 @@
 package com.bencassedy.spartakos.enron
 
 import com.bencassedy.spartakos.common.SpartakosSparkContext
-import Config
 
 /**
   * application for analyzing the results of the knn clustering on a set of
@@ -10,8 +9,8 @@ import Config
   */
 object EnronSparkAnalysis extends App {
   // configure and init spark
-  val (sparkContext, sqlContext) = SpartakosSparkContext.init
-  val config = new Config()
+  val (sparkContext, sqlContext) = SpartakosSparkContext.init()
+  val config = new EnronConfig()
   import sqlContext.implicits._
 
   // category counts:

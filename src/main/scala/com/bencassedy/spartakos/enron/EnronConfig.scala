@@ -1,9 +1,12 @@
 package com.bencassedy.spartakos.enron
 
+import com.bencassedy.spartakos.common.SpartakosConfig
+
 /**
   * Project configuration settings
   */
-case class Config(
+// TODO: refactor to match reddit config and extend SpartakosConfig
+case class EnronConfig (
                    numClusters: Int = 20,
                    sampleSize: Double = 0.1,
                    numTextFeatures: Int = 1000,
@@ -15,7 +18,7 @@ case class Config(
                  )
 
 object ConfigParser {
-  val parser = new scopt.OptionParser[Config]("enron-spark") {
+  val parser = new scopt.OptionParser[EnronConfig]("enron-spark") {
     head ("enron-spark", "1.0")
     opt[String] ("output") action {
       (param, config) =>

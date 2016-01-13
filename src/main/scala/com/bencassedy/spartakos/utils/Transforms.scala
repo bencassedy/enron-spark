@@ -1,6 +1,6 @@
 package com.bencassedy.spartakos.utils
 
-import com.bencassedy.spartakos.enron.Config
+import com.bencassedy.spartakos.enron.EnronConfig
 import com.bencassedy.spartakos.utils.StringUtils._
 import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.linalg.Vector
@@ -20,7 +20,7 @@ object Transforms {
     * @param df dataframe of email body payloads
     * @return
     */
-  def transformBodies(df: DataFrame, colName: String)(implicit config: Config): DataFrame = {
+  def transformBodies(df: DataFrame, colName: String)(implicit config: EnronConfig): DataFrame = {
     // the transformers
     val tokenizer = new RegexTokenizer().setInputCol(colName).setOutputCol("words").setPattern("\\w+").setGaps(false)
     val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
