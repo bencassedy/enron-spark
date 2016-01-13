@@ -1,7 +1,7 @@
 package com.bencassedy.spartakos.enron
 
 import com.bencassedy.spartakos.common.SpartakosSparkContext
-import com.bencassedy.spartakos.enron.config.Config
+import Config
 
 /**
   * application for analyzing the results of the knn clustering on a set of

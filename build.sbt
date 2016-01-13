@@ -1,4 +1,4 @@
-name := "enron-spark"
+name := "spartakos"
 version := "1.0"
 scalaVersion := "2.11.7"
 
@@ -8,9 +8,10 @@ libraryDependencies += "org.apache.spark" % "spark-mllib_2.11" % "1.5.1" % "prov
 libraryDependencies += "org.mongodb.mongo-hadoop" % "mongo-hadoop-core" % "1.4.1" % "provided"
 libraryDependencies += "org.mongodb" % "mongo-java-driver" % "3.1.0" % "provided"
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
+libraryDependencies += "com.typesafe" % "config" % "1.2.1"
 
 // build an assembly jar
-assemblyJarName in assembly := "enron-spark.jar"
+assemblyJarName in assembly := "spartakos.jar"
 mainClass in assembly := Some("EnronSpark")
 assemblyMergeStrategy in assembly := {
   case PathList("META-INF", xs @ _*)                 => MergeStrategy.discard

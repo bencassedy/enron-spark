@@ -1,6 +1,6 @@
 package com.bencassedy.spartakos.utils
 
-import com.bencassedy.spartakos.enron.config.Config
+import com.bencassedy.spartakos.enron.Config
 import com.bencassedy.spartakos.utils.StringUtils._
 import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.linalg.Vector
