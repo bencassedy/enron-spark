@@ -1,4 +1,4 @@
-package com.bencassedy.enron
+package com.bencassedy.spartakos.enron
 
 import java.io.{File, PrintWriter}
 

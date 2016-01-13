@@ -1,4 +1,4 @@
-package com.bencassedy.enron.config
+package com.bencassedy.spartakos.enron.config
 
 /**
   * Project configuration settings

@@ -1,7 +1,7 @@
-package com.bencassedy.enron
+package com.bencassedy.spartakos.enron
 
-import com.bencassedy.enron.common.EnronSparkContext
-import com.bencassedy.enron.config.Config
+import com.bencassedy.spartakos.common.SpartakosSparkContext
+import com.bencassedy.spartakos.enron.config.Config
 
 /**
   * application for analyzing the results of the knn clustering on a set of
@@ -10,7 +10,7 @@ import com.bencassedy.enron.config.Config
   */
 object EnronSparkAnalysis extends App {
   // configure and init spark
-  val (sparkContext, sqlContext) = EnronSparkContext.init
+  val (sparkContext, sqlContext) = SpartakosSparkContext.init
   val config = new Config()
   import sqlContext.implicits._
 

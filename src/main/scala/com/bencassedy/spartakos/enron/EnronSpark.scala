@@ -1,16 +1,16 @@
-package com.bencassedy.enron
+package com.bencassedy.spartakos.enron
 
 import java.io.File
 
-import com.bencassedy.enron.common.EnronSparkContext
-import com.bencassedy.enron.config._
+import com.bencassedy.spartakos.common.SpartakosSparkContext
+import com.bencassedy.spartakos.enron.config._
 import org.apache.commons.io.FileUtils
 import org.apache.spark.ml.feature._
 import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
-import com.bencassedy.enron.utils.Transforms._
+import com.bencassedy.spartakos.utils.Transforms._
 
 /**
   * do spark stuff on Enron
@@ -19,7 +19,7 @@ object EnronSpark extends App {
   implicit val config = new Config()
 
   // configure and init spark
-  val (sparkContext, sqlContext) = EnronSparkContext.init
+  val (sparkContext, sqlContext) = SpartakosSparkContext.init
 
   val enronDF = sqlContext.read.json(config.inputFile)
     .sample(withReplacement = false, config.sampleSize, Math.random().toLong).cache()

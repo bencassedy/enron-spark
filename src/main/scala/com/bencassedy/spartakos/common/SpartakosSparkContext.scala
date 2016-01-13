@@ -1,4 +1,4 @@
-package com.bencassedy.enron.common
+package com.bencassedy.spartakos.common
 
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkContext, SparkConf}
@@ -6,7 +6,7 @@ import org.apache.spark.{SparkContext, SparkConf}
 /**
   * Reusable wrapper that contains instantiated spark context
   */
-object EnronSparkContext {
+object SpartakosSparkContext {
 
   def init: (SparkContext, SQLContext) = {
     val conf = new SparkConf()
