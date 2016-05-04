@@ -1,28 +1,25 @@
 package com.bencassedy.spartakos.enron
 
 import com.bencassedy.spartakos.common.SpartakosConfig
+import com.typesafe.config.{ConfigFactory, Config}
 
 /**
   * Project configuration settings
   */
-// TODO: refactor to match reddit config and extend SpartakosConfig
-case class EnronConfig (
-                   numClusters: Int = 20,
-                   sampleSize: Double = 0.1,
-                   numTextFeatures: Int = 1000,
-                   idfMinDocFreq: Int = 4,
-                   trainingTestSplit: Array[Double] = Array(0.8, 0.2),
-                   trainingIterations: Int = 100,
-                   inputFile: String = "enron.json",
-                   outputLocation: String = "./results.txt"
-                 )
+class EnronConfig(appName: String) extends SpartakosConfig {
+//  val config: Config = ConfigFactory.load(appName)
 
-object ConfigParser {
-  val parser = new scopt.OptionParser[EnronConfig]("enron-spark") {
-    head ("enron-spark", "1.0")
-    opt[String] ("output") action {
-      (param, config) =>
-        config.copy (outputLocation = param)
-    } text "Optional file output location. Defaults to './results.txt'"
-  }
+  // TODO: factor these out to a config file
+  val numClusters: Int = 20
+  val sampleSize: Double = 0.1
+  val numTextFeatures: Int = 1000
+  val idfMinDocFreq: Int = 4
+  val trainingTestSplit: Array[Double] = Array(0.8, 0.2)
+  val trainingIterations: Int = 100
+  val inputFile: String = "enron.json"
+  val outputLocation: String = "./results.txt"
+}
+
+object EnronConfig {
+  def apply(appName: String) = new EnronConfig(appName)
 }

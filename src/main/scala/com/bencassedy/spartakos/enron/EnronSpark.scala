@@ -15,10 +15,10 @@ import com.bencassedy.spartakos.utils.Transforms._
   * do spark stuff on Enron
   */
 object EnronSpark extends App {
-  implicit val config = new Config()
+  implicit val config = EnronConfig("EnronSpark")
 
   // configure and init spark
-  val (sparkContext, sqlContext) = SpartakosSparkContext.init
+  val (sparkContext, sqlContext) = SpartakosSparkContext.init()
 
   val enronDF = sqlContext.read.json(config.inputFile)
     .sample(withReplacement = false, config.sampleSize, Math.random().toLong).cache()
@@ -72,13 +72,13 @@ object EnronSpark extends App {
     .join(rawResultsDF, test("$oid") === rawResultsDF("_2"))
     .withColumnRenamed("_1", "category").drop("_2")
 
-  ConfigParser.parser.parse(args, Config()) match {
-    case Some(cfg) =>
-      // if we are using a non-s3 output location, delete the file before writing
-      if (args.length == 0 || !cfg.outputLocation.startsWith("s3://"))
-        FileUtils.deleteDirectory(new File(config.outputLocation))
-      remappedResultsDF.write.save(config.outputLocation)
-    case None =>
-    // arguments are bad, error message will have been displayed
-  }
+//  ConfigParser.parser.parse(args, Config()) match {
+//    case Some(cfg) =>
+//      // if we are using a non-s3 output location, delete the file before writing
+//      if (args.length == 0 || !cfg.outputLocation.startsWith("s3://"))
+//        FileUtils.deleteDirectory(new File(config.outputLocation))
+//      remappedResultsDF.write.save(config.outputLocation)
+//    case None =>
+//    // arguments are bad, error message will have been displayed
+//  }
 }

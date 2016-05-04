@@ -6,16 +6,16 @@ import org.apache.spark.sql.DataFrame
 /**
   * Singleton object to run word2vec algorithm on dataframe
   */
-object Word2Vec {
+object Word2VecUtils {
 
-  def word2Vec(df: DataFrame, searchTerm: String, numSynonyms: Int): DataFrame = {
+  def buildWord2Vec(df: DataFrame, searchTerm: String, numSynonyms: Int): DataFrame = {
     val word2vec = new Word2Vec()
     val model = word2vec.fit(df)
     val synonyms = model.findSynonyms(searchTerm, numSynonyms)
 
-    for((synonym, cosineSimilarity) <- synonyms) {
-      println(s"$synonym $cosineSimilarity")
-    }
+//    for((synonym, cosineSimilarity) <- synonyms) {
+//      println(s"$synonym $cosineSimilarity")
+//    }
 
     synonyms
   }

@@ -7,10 +7,10 @@ import com.bencassedy.spartakos.common.SpartakosSparkContext
   */
 object EnronModelRunner {
   def main(args: Array[String]) {
-    implicit val config = new Config()
+    implicit val config = EnronConfig("EnronModelRunner")
 
     // configure and init spark
-    val (sparkContext, sqlContext) = SpartakosSparkContext.init
+    val (sparkContext, sqlContext) = SpartakosSparkContext.init()
 
     val enronDF = sqlContext.read.json(config.inputFile)
   }

@@ -9,8 +9,8 @@ import com.bencassedy.spartakos.common.SpartakosSparkContext
   */
 object EnronSparkAnalysis extends App {
   // configure and init spark
-  val (sparkContext, sqlContext) = SpartakosSparkContext.init
-  val config = new Config()
+  val (sparkContext, sqlContext) = SpartakosSparkContext.init()
+  val config = EnronConfig("EnronSparkAnalysis")
   import sqlContext.implicits._
 
   // category counts:

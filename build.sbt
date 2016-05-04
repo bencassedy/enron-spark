@@ -3,9 +3,9 @@ version := "1.0"
 scalaVersion := "2.11.7"
 val sparkVersion = "1.6.1"
 
-libraryDependencies += "org.apache.spark" % "spark-core_2.11" % sparkVersion % "provided"
-libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % sparkVersion % "provided"
-libraryDependencies += "org.apache.spark" % "spark-mllib_2.11" % sparkVersion % "provided"
+libraryDependencies += "org.apache.spark" % "spark-core_2.11" % sparkVersion
+libraryDependencies += "org.apache.spark" % "spark-sql_2.11" % sparkVersion
+libraryDependencies += "org.apache.spark" % "spark-mllib_2.11" % sparkVersion
 libraryDependencies += "org.mongodb.mongo-hadoop" % "mongo-hadoop-core" % "1.4.1" % "provided"
 libraryDependencies += "org.mongodb" % "mongo-java-driver" % "3.1.0" % "provided"
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"

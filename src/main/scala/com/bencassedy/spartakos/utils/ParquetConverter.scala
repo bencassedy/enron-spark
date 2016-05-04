@@ -9,9 +9,9 @@ import com.bencassedy.spartakos.common.SpartakosSparkContext
   */
 object ParquetConverter {
   def main(args: Array[String]) {
-    if (args.length < 2) println("input file argument is required"); sys.exit(1)
+    if (args.length < 1) sys.exit(1)
 
-    val (_, sqlContext) = SpartakosSparkContext.init
-    sqlContext.read.json(args(1)).write.parquet(args(1) + ".parquet")
+    val (_, sqlContext) = SpartakosSparkContext.init()
+    sqlContext.read.json(args(0)).write.parquet(args(0) + ".parquet")
   }
 }
