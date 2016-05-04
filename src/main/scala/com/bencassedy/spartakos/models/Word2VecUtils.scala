@@ -8,8 +8,8 @@ import org.apache.spark.sql.DataFrame
   */
 object Word2VecUtils {
 
-  def buildWord2Vec(df: DataFrame, searchTerm: String, numSynonyms: Int): DataFrame = {
-    val word2vec = new Word2Vec()
+  def buildWord2Vec(df: DataFrame, inputColumn: String, searchTerm: String, numSynonyms: Int): DataFrame = {
+    val word2vec = new Word2Vec().setInputCol(inputColumn)
     val model = word2vec.fit(df)
     val synonyms = model.findSynonyms(searchTerm, numSynonyms)
 

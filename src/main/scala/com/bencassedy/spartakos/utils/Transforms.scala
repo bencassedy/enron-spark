@@ -41,7 +41,7 @@ object Transforms {
     // map the transformations onto the data
     val wordsData = tokenizer.transform(df)
 
-    remover.transform(wordsData)
+    remover.transform(wordsData).drop("words")
   }
 
   def tfIdf(df: DataFrame, inputColName: String, numFeatures: Int, minDocFreq: Int): (DataFrame, IDFModel) = {

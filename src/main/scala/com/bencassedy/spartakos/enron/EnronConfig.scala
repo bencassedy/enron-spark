@@ -16,7 +16,7 @@ class EnronConfig(appName: String) extends SpartakosConfig {
   val idfMinDocFreq: Int = 4
   val trainingTestSplit: Array[Double] = Array(0.8, 0.2)
   val trainingIterations: Int = 100
-  val inputFile: String = "enron.json"
+  val inputFile: String = "enron.json.parquet"
   val outputLocation: String = "./results.txt"
 }
 
