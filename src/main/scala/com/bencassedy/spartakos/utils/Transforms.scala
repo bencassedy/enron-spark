@@ -22,18 +22,38 @@ object Transforms {
     */
   def transformBodies(df: DataFrame, colName: String)(implicit config: EnronConfig): DataFrame = {
     // the transformers
-    val tokenizer = new RegexTokenizer().setInputCol(colName).setOutputCol("words").setPattern("\\w+").setGaps(false)
-    val remover = new StopWordsRemover().setInputCol("words").setOutputCol("filteredWords")
     val ngramizer = new NGram().setN(3).setInputCol("filteredWords").setOutputCol("ngrams")
     val hasher = new HashingTF().setInputCol("ngrams").setOutputCol("rawFeatures").setNumFeatures(config.numTextFeatures)
 
     // apply the transformers to the data
-    val wordsData = tokenizer.transform(df)
-    val filteredWords = remover.transform(wordsData)
+    val filteredWords = tokenize(df, colName, "filteredWords")
     val ngrams = ngramizer.transform(filteredWords)
     val filteredWordsWithCounts = ngrams.withColumn("wordCounts", wordCounts(ngrams("ngrams")))
 
     hasher.transform(filteredWordsWithCounts)
+  }
+
+  def tokenize(df: DataFrame, inputColName: String, outputColName: String): DataFrame = {
+    // define the transformations
+    val tokenizer = new RegexTokenizer().setInputCol(inputColName).setOutputCol("words").setPattern("\\w+").setGaps(false)
+    val remover = new StopWordsRemover().setInputCol("words").setOutputCol(outputColName)
+
+    // map the transformations onto the data
+    val wordsData = tokenizer.transform(df)
+
+    remover.transform(wordsData)
+  }
+
+  def tfIdf(df: DataFrame, inputColName: String, numFeatures: Int, minDocFreq: Int): (DataFrame, IDFModel) = {
+    // define the transformations
+    val hasher = new HashingTF().setInputCol(inputColName).setOutputCol("rawFeatures").setNumFeatures(numFeatures)
+    val idf = new IDF().setInputCol("rawFeatures").setOutputCol("features").setMinDocFreq(minDocFreq)
+
+    // map the transformations onto the data
+    val hashed = hasher.transform(df)
+    val idfModel = idf.fit(hashed)
+
+    (idfModel.transform(hashed), idfModel)
   }
 
   /**
@@ -45,7 +65,7 @@ object Transforms {
     * @param idfModel the IDF model that will perform the rescaling
     * @return dataframe identical to the input df, but with idf-rescaled features
     */
-  def rescaleData(df: DataFrame)(implicit idfModel: IDFModel) :RDD[(String, Vector)] = {
+  def rescaleData(df: DataFrame)(implicit idfModel: IDFModel): RDD[(String, Vector)] = {
     idfModel.transform(df)
       .select("$oid", "features")
       .map {
