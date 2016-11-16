@@ -1,6 +1,6 @@
 name := "spartakos"
 version := "1.0"
-scalaVersion := "2.11.7"
+scalaVersion := "2.11.8"
 val sparkVersion = "2.0.0"
 
 libraryDependencies += "org.apache.spark" % "spark-core_2.11" % sparkVersion
@@ -13,6 +13,10 @@ libraryDependencies += "com.typesafe" % "config" % "1.2.1"
 libraryDependencies += "io.continuum.bokeh" % "bokeh_2.11" % "0.7"
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0"
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.6.0" classifier "models"
+libraryDependencies += "com.holdenkarau" % "spark-testing-base_2.11" % "2.0.1_0.4.7" % "test"
+
+// bump up some of the JVM defaults
+javaOptions ++= Seq("-Xms1024M", "-Xmx4096M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
 
 // build an assembly jar
 assemblyJarName in assembly := "spartakos.jar"
