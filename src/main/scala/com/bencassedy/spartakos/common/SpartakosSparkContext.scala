@@ -8,7 +8,6 @@ import org.apache.spark.{SparkContext, SparkConf}
   * Reusable wrapper that contains instantiated spark context
   */
 object SpartakosSparkContext {
-
   def init(spc: Option[SpartakosConfig] = None): (SparkContext, SQLContext) = {
     val sparkConf = new SparkConf()
       .setAppName("Enron")
@@ -17,6 +16,7 @@ object SpartakosSparkContext {
       .set("spark.driver.memory", "4g")
       .set("spark.executor.memory", "4g")
       .set("spark.worker.cores", "1")
+      .set("spark.executor.heartbeatInterval", "30")
     spc match {
       case spc: Some[RedditConfig] => sparkConf.set("spark.executor.cores", spc.get.sparkExecutorCores)
       case _ =>
